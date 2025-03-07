@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рулетка подарков</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Следующий подарок получит...</h1>
+        <button onclick="pickWinner()">Запустить рулетку</button>
+        <p id="winner">???</p>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.3.2"></script>
+    <script>
+        let firstTime = true;
+
+        const names = [
+            "Dilfuza", "Azatbek", "Timur", "Adema", "Aymurat",
+            "Ulbibi", "A.Aziz", "S.Aziz", "Nurs", "Abbaz",
+            "Gulzar", "Fatima", "Ruslan", "Gulznaz", "Diyorbek",
+            "Murat", "Xusniya", "Joni", "Munisa", "Maxmud",
+            "Muxammed", "Jalol", "Rasul", "Eliza"
+        ];
+
+        const weights = {
+            "Dilfuza": 35,
+            "Eliza": 1,
+            "Timur": 9,
+            "Muxammed": 9,
+            "Adema": 9,
+            "Aymurat": 7,
+            "Ulbibi": 5,
+            "A.Aziz": 5,
+            "S.Aziz": 5,
+            "Nurs": 8,
+            "Abbaz": 5,
+            "Gulzar": 4,
+            "Fatima": 4,
+            "Ruslan": 4,
+            "Gulznaz": 4,
+            "Diyorbek": 4,
+            "Murat": 3,
+            "Xusniya": 3,
+            "Joni": 3,
+            "Munisa": 3,
+            "Maxmud": 3,
+            "Jalol": 3,
+            "Rasul": 3
+        };
+
+        let weightedNames = [];
+        for (let name in weights) {
+            for (let i = 0; i < weights[name]; i++) {
+                weightedNames.push(name);
+            }
+        }
+
+        let tickSound = new Audio("tick.mp3"); 
+        let winSound = new Audio("win.mp3");
+        let surpriseSound = new Audio("surprise.mp3");
+
+        function pickWinner() {
+            let winnerElement = document.getElementById("winner");
+
+            if (firstTime) {
+                firstTime = false;
+                winnerElement.innerText = "Dilfuza";
+                winSound.play();
+                confetti();
+                return;
+            }
+
+            let count = 0;
+            let duration = 15000;
+            let intervalTime = 100;
+            let totalIterations = duration / intervalTime;
+
+            let interval = setInterval(() => {
+                tickSound.play();
+                let randomName = weightedNames[Math.floor(Math.random() * weightedNames.length)];
+                winnerElement.innerText = randomName;
+                count++;
+
+                if (count >= totalIterations) { 
+                    clearInterval(interval);
+                    winSound.play(); 
+                    confetti();  
+                    if (randomName === "Dilfuza") {
+                        setTimeout(() => {
+                            alert("Сюрприз! Специальный бонус для победителя 🎁");
+                            surpriseSound.play();
+                        }, 1000);
+                    }
+                }
+            }, intervalTime);
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #222, #444);
+            color: white;
+            text-align: center;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+        }
+
+        button {
+            background: #ff7eb3;
+            border: none;
+            padding: 12px 25px;
+            color: white;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #ff4f8b;
+        }
+
+        p {
+            font-size: 24px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</body>
+</html>
