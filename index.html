@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Рулетка подарков</title>
-    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.3.2"></script>
 </head>
 <body>
     <div class="container">
         <h1>Следующий подарок получит...</h1>
-        <button onclick="pickWinner()">Запустить рулетку</button>
+        <button id="startButton" onclick="pickWinner()">Запустить рулетку</button>
         <p id="winner">???</p>
+        <div id="progressBar"></div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.3.2"></script>
+
     <script>
         let firstTime = true;
-
         const names = [
             "Dilfuza", "Azatbek", "Timur", "Adema", "Aymurat",
             "Ulbibi", "A.Aziz", "S.Aziz", "Nurs", "Abbaz",
@@ -26,16 +26,16 @@
         ];
 
         const weights = {
-            "Dilfuza": 35,
+            "Dilfuza": 50,
             "Eliza": 1,
-            "Timur": 9,
-            "Muxammed": 9,
-            "Adema": 9,
+            "Timur": 8,
+            "Muxammed": 8,
+            "Adema": 7,
             "Aymurat": 7,
             "Ulbibi": 5,
             "A.Aziz": 5,
             "S.Aziz": 5,
-            "Nurs": 8,
+            "Nurs": 5,
             "Abbaz": 5,
             "Gulzar": 4,
             "Fatima": 4,
@@ -58,21 +58,25 @@
             }
         }
 
-        let tickSound = new Audio("tick.mp3"); 
+        let tickSound = new Audio("tick.mp3");
         let winSound = new Audio("win.mp3");
         let surpriseSound = new Audio("surprise.mp3");
 
         function pickWinner() {
             let winnerElement = document.getElementById("winner");
+            let startButton = document.getElementById("startButton");
+            let progressBar = document.getElementById("progressBar");
 
             if (firstTime) {
                 firstTime = false;
-                winnerElement.innerText = "Dilfuza";
+                winnerElement.innerText = "нажми еще раз алоо";
                 winSound.play();
                 confetti();
                 return;
             }
 
+            startButton.disabled = true;
+            progressBar.style.width = '0%';
             let count = 0;
             let duration = 15000;
             let intervalTime = 100;
@@ -84,58 +88,112 @@
                 winnerElement.innerText = randomName;
                 count++;
 
-                if (count >= totalIterations) { 
+                let progress = Math.min(100, (count / totalIterations) * 100);
+                progressBar.style.width = progress + '%';
+
+                if (count >= totalIterations) {
                     clearInterval(interval);
-                    winSound.play(); 
-                    confetti();  
+                    winSound.play();
+                    confetti();
                     if (randomName === "Dilfuza") {
                         setTimeout(() => {
                             alert("Сюрприз! Специальный бонус для победителя 🎁");
                             surpriseSound.play();
                         }, 1000);
                     }
+                    startButton.disabled = false;
                 }
             }, intervalTime);
         }
     </script>
+
     <style>
+        /* Основной фон с анимацией */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(135deg, #222, #444);
+            margin: 0;
+            background: linear-gradient(45deg, #ff7b00, #ff0099, #ff00ff, #6a00ff);
+            background-size: 300% 300%;
+            animation: gradientAnimation 8s ease infinite;
             color: white;
             text-align: center;
         }
 
+        /* Контейнер */
         .container {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            width: 100%;
         }
 
+        /* Заголовок */
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #fff;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Кнопка */
         button {
-            background: #ff7eb3;
+            background: linear-gradient(135deg, #ff61a6, #ff3496);
             border: none;
-            padding: 12px 25px;
+            padding: 15px 30px;
             color: white;
-            font-size: 18px;
-            border-radius: 5px;
+            font-size: 20px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
+        /* Эффект при наведении */
         button:hover {
-            background: #ff4f8b;
+            background: linear-gradient(135deg, #ff3496, #ff61a6);
+            transform: scale(1.05);
         }
 
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Отображение победителя */
         p {
-            font-size: 24px;
-            margin-top: 15px;
+            font-size: 28px;
+            margin-top: 20px;
             font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Прогресс-бар */
+        #progressBar {
+            margin-top: 30px;
+            height: 8px;
+            background-color: #333;
+            border-radius: 10px;
+            width: 100%;
+            transition: width 0.1s ease;
+        }
+
+        /* Для плавности переходов */
+        #progressBar {
+            background: linear-gradient(to right, #ff7eb3, #ff4f8b);
+        }
+
+        /* Анимация фона */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
     </style>
 </body>
